@@ -1,0 +1,59 @@
+#PMR PNSA_DC Script Version
+VERSION=1.0
+
+# CLLI sites that need to be skipped for PM file generation
+SKIPCLLI="SOMESITEADC SOMESITEABC"
+
+BASEPATH="/data/scripts/PMR/PNSA"
+DATAPATH="${BASEPATH}/var"
+
+REMOTEDATAPATH="/data/mgmt/pmr/data/pm/PNSA"
+SAPSCRIPTPATH="/data/mgmt/pmr/scripts/pm/PNSA"
+
+PMFILEWRITER="${BASEPATH}/pmfile_writer.sh"
+LOGFILE=/var/log/PMRLogger.log
+
+# Clean data older than X days
+CLEANDATE=3
+
+# Binaries
+SSH='/usr/bin/ssh -q -o ConnectTimeout=5 -o UserKnownHostsFile=/dev/null -l root '
+SADF=`which sadf`
+AWK=`which awk`
+DATE=`which date`
+CLI='/opt/tms/bin/cli -t "en" "conf t" '
+CLIRAW='/opt/tms/bin/cli '
+PMX='/opt/tps/bin/pmx.py'
+HADOOP='/opt/hadoop/bin/hadoop'
+RSYNC='/usr/bin/rsync'
+RSYNCOPT=' -azr '
+RSYNCEXCLUDEPMR=' --exclude=var --exclude=*.csv '
+
+# Remote Host to Sync PM files
+REMOTEHOST="172.30.5.63 172.30.5.57 172.30.5.58"
+
+# Node Status return codes
+   NAMENODE=2
+   DATANODE=4
+SECONDARYNN=8
+ JOBTRACKER=16
+   CATALINA=32
+TASKTRACKER=64
+     HSQLDB=128
+     TOMCAT=256
+      TIBCO=512
+    CALPONT=1024
+  COLLECTOR=2048
+
+# Hadoop site status return codes (bitmask)
+   S_NAMENODE=2
+   S_DATANODE=100
+S_SECONDARYNN=8
+ S_JOBTRACKER=16
+   S_CATALINA=32
+
+
+function write_log
+{
+  printf "%s [%s] %s\n" "`date`" "`basename $0`" "$*" >> ${LOGFILE}
+}

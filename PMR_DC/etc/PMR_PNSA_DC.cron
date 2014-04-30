@@ -1,0 +1,16 @@
+MAILTO=anil.thyagarajan@guavus.com
+
+# Run the 15 minute job to get all node statuses in PNSA_DC 
+*/15 * * * *	root	/data/scripts/PMR/PNSA/bin/PNSA_DCNodeStatus.sh
+
+# Run the hourly job to get CPU/Mem Utilization from all PNSA_DC Nodes
+57 * * * *	root	/data/scripts/PMR/PNSA/bin/PNSA_DCNodeUtilization.sh
+
+# Run the Sync Job every hour at 35 minutes past the hour
+35 * * * *      root    /data/scripts/PMR/PNSA/bin/SyncPNSA_PMRHosts.sh
+
+# Run the Sync Job every day at 30 minutes past the 23 hour, sync scripts from SAP to PNSA
+30 23 * * *      root    /data/scripts/PMR/PNSA/bin/SyncSAP_PNSA_DCHosts.sh
+
+# Clean up older than 7 days files
+55 23 * * *     root    /data/scripts/PMR/PNSA/bin/Cleanup.sh
