@@ -37,6 +37,8 @@ my $appVSip = $AppIPmap->getAppICNMaping();
 my $START     = `$ENV{DATE} +"%H:50:00" -d "1 hour ago"`; chomp($START);
 my $END       = `$ENV{DATE} +"%H:59:00"`; chomp($END);
 
+$START='00:00:00' if $START eq '23:50:00';
+
 foreach my $app (keys %$appVSip) {
   foreach my $ip (@{$appVSip->{$app}}) {
     
