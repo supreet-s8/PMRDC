@@ -12,7 +12,7 @@ DC=${1}
 #===========
 INSTALLPATH="/data/scripts/PMR/${DC}"
 CLLI=`hostname | awk -F- '{print $1}' | sed -e 's/NSA$//'`
-TOOL="pmr-code-v05.tar.gz"
+TOOL="pmr-code-v06.tar.gz"
 SOURCE="/tmp/PMR_DC"
 DEST="/tmp"
 REMOTESANREPO="/data/mgmt/pmr/scripts/pm/${DC}"
