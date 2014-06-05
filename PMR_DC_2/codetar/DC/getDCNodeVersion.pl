@@ -56,8 +56,12 @@ foreach my $app (keys %$appVSip) {
 
     $version="" if($version !~ /\w+/);
 
-    my $host_cmd="grep \"$ip\" \'/etc/hosts\' | awk \'{print \$NF}\'";
-    my $host=`$host_cmd`; chomp $host;
+    my $host_cmd1="$ENV{SSH} $ip \'hostname\'";
+    my $host=''; $host=`$host_cmd1`; chomp $host;
+    if (!$host) {
+       my $host_cmd="grep \"$ip\" \'/etc/hosts\' | awk \'{print \$NF}\'";
+       $host=`$host_cmd`; chomp $host;
+    }
     my $siteCLLI = $1 if($host =~ /(\w+)-.+$/);
     $siteCLLI =~ s/NSA$//;
 
@@ -88,8 +92,12 @@ foreach my $app (keys %$appVSip) {
     } split(/\n/, $patch_cmd_out);
     $patches="" if ($patches !~ /\w+/);
 
-    my $host_cmd="grep \"$ip\" \'/etc/hosts\' | awk \'{print \$NF}\'";
-    my $host=`$host_cmd`; chomp $host;
+    my $host_cmd1="$ENV{SSH} $ip \'hostname\'";
+    my $host=''; $host=`$host_cmd1`; chomp $host;
+    if (!$host) {
+       my $host_cmd="grep \"$ip\" \'/etc/hosts\' | awk \'{print \$NF}\'";
+       $host=`$host_cmd`; chomp $host;
+    }
     my $siteCLLI = $1 if($host =~ /(\w+)-.+$/);
     $siteCLLI =~ s/NSA$//;
 
