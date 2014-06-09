@@ -58,7 +58,7 @@ function createSAN {
 
 function symLink {
 	if [[ ${SETUP} == 'SMLAB' ]]; then
-	echo "---Performing LAB specific operations"
+	echo "---Performing SMLAB specific operations"
 	   for host in ${NN}; do
 	      ${SSH} $host "/bin/rm -rf ${INSTALLPATH}/etc/PMRConfig.cfg"
 	      sleep 1
@@ -68,6 +68,19 @@ function symLink {
 	   sleep 1
 	   ${SSH} ${prefix1}${mgmt0} "cd ${REMOTESANREPO}/etc/ ; /bin/ln -s PMRConfig.smlab ./PMRConfig.cfg"
 	fi
+
+	if [[ ${SETUP} == 'NORSE' ]]; then
+        echo "---Performing Norse LAB specific operations"
+           for host in ${NN}; do
+              ${SSH} $host "/bin/rm -rf ${INSTALLPATH}/etc/PMRConfig.cfg"
+              sleep 1
+              ${SSH} $host "cd ${INSTALLPATH}/etc/ ; /bin/ln -s PMRConfig.norselab ./PMRConfig.cfg"
+           done
+           ${SSH} ${prefix1}${mgmt0} "/bin/rm -rf ${REMOTESANREPO}/etc/PMRConfig.cfg"
+           sleep 1
+           ${SSH} ${prefix1}${mgmt0} "cd ${REMOTESANREPO}/etc/ ; /bin/ln -s PMRConfig.norselab ./PMRConfig.cfg"
+        fi
+
 
 	echo "---Scheduling PMR jobs"
 	for host in ${NN}; do
