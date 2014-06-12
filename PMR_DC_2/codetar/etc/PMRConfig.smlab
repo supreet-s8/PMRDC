@@ -29,7 +29,7 @@ CLIRAW='/opt/tms/bin/cli '
 PMX='/opt/tps/bin/pmx.py'
 HADOOP='/opt/hadoop/bin/hadoop'
 RSYNC='/usr/bin/rsync'
-RSYNCOPT=' -azr '
+RSYNCOPT=' -azre ssh '
 RSYNCEXCLUDEPMR=' --exclude=var --exclude=*.csv '
 CLLI=`hostname | awk -F- '{print $1}' | sed -e 's/NSA$//g'`
 

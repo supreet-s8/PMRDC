@@ -12,7 +12,7 @@ DC=${1}
 #===========
 INSTALLPATH="/data/scripts/PMR/${DC}"
 CLLI=`hostname | awk -F- '{print $1}' | sed -e 's/NSA$//'`
-TOOL="pmr-code-v06.tar.gz"
+TOOL="pmr-code-v07.tar.gz"
 SOURCE="/tmp/PMR_DC"
 DEST="/tmp"
 REMOTESANREPO="/data/mgmt/pmr/scripts/pm/${DC}"
@@ -81,6 +81,17 @@ function symLink {
            ${SSH} ${prefix1}${mgmt0} "cd ${REMOTESANREPO}/etc/ ; /bin/ln -s PMRConfig.norselab ./PMRConfig.cfg"
         fi
 
+	if [[ ${SETUP} == 'PDI' ]]; then
+        echo "---Performing PDI LAB specific operations"
+           for host in ${NN}; do
+              ${SSH} $host "/bin/rm -rf ${INSTALLPATH}/etc/PMRConfig.cfg"
+              sleep 1
+              ${SSH} $host "cd ${INSTALLPATH}/etc/ ; /bin/ln -s PMRConfig.pdilab ./PMRConfig.cfg"
+           done
+           ${SSH} ${prefix1}${mgmt0} "/bin/rm -rf ${REMOTESANREPO}/etc/PMRConfig.cfg"
+           sleep 1
+           ${SSH} ${prefix1}${mgmt0} "cd ${REMOTESANREPO}/etc/ ; /bin/ln -s PMRConfig.pdilab ./PMRConfig.cfg"
+        fi
 
 	echo "---Scheduling PMR jobs"
 	for host in ${NN}; do

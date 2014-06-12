@@ -34,7 +34,7 @@ RSYNCEXCLUDEPMR=' --exclude=var --exclude=*.csv '
 CLLI=`hostname | awk -F- '{print $1}' | sed -e 's/NSA$//g'`
 
 # Remote Host to Sync PM files
-REMOTEHOST="10.136.239.161 10.136.239.63 10.136.239.65"
+REMOTEHOST="10.136.46.106"
 
 # Node Status return codes
    NAMENODE=2
