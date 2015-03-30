@@ -1,0 +1,27 @@
+[admin@SMLABNSA-A-GV-HPC7-20 PMR_DC]# grep -ri insertdcvalue DC etc bin
+etc/PMR_DC.cron:*/15 * * * *	root	/data/scripts/PMR/insertdcvalue/bin/DCNodeStatus.sh
+etc/PMR_DC.cron:57 * * * *	root	/data/scripts/PMR/insertdcvalue/bin/DCNodeUtilization.sh
+etc/PMR_DC.cron:35 * * * *      root    /data/scripts/PMR/insertdcvalue/bin/SyncDC_PMRHosts.sh
+etc/PMR_DC.cron:30 23 * * *      root    /data/scripts/PMR/insertdcvalue/bin/SyncSAP_DCHosts.sh
+etc/PMR_DC.cron:55 23 * * *     root    /data/scripts/PMR/insertdcvalue/bin/Cleanup.sh
+etc/PMRConfig.prod:INSTALLTYPE=insertdcvalue
+etc/PMRConfig.cfg:INSTALLTYPE=insertdcvalue
+etc/PMRConfig.smlab:INSTALLTYPE=insertdcvalue
+bin/DCNodeStatus.sh:. /data/scripts/PMR/insertdcvalue/etc/PMRConfig.cfg
+bin/SyncSAP_DCHosts.sh:. /data/scripts/PMR/insertdcvalue/etc/PMRConfig.cfg
+bin/Cleanup.sh:. /data/scripts/PMR/insertdcvalue/etc/PMRConfig.cfg
+bin/SyncDC_PMRHosts.sh:. /data/scripts/PMR/insertdcvalue/etc/PMRConfig.cfg
+bin/DCNodeUtilization.sh:. /data/scripts/PMR/insertdcvalue/etc/PMRConfig.cfg
+[admin@SMLABNSA-A-GV-HPC7-20 PMR_DC]#
+
+
+[admin@SMLABNSA-A-GV-HPC7-20 PMR_DC]# grep -ri insertdcvalue installPMR_DC.sh
+function insertDCValue {
+	   ${SSH} $host "perl -pi -e 's/insertdcvalue/$DC/g' ${INSTALLPATH}/etc/*"
+	   ${SSH} $host "perl -pi -e 's/insertdcvalue/$DC/g' ${INSTALLPATH}/bin/*"
+	   ${SSH} $host "perl -pi -e 's/insertdcvalue/$DC/g' ${INSTALLPATH}/DC/*" 2>/dev/null
+	${SSH} ${prefix}${mgmt0} "perl -pi -e 's/insertdcvalue/$DC/g' ${REMOTESANREPO}/etc/*"
+	${SSH} ${prefix}${mgmt0} "perl -pi -e 's/insertdcvalue/$DC/g' ${REMOTESANREPO}/bin/*"
+	${SSH} ${prefix}${mgmt0} "perl -pi -e 's/insertdcvalue/$DC/g' ${REMOTESANREPO}/DC/*" 2>/dev/null
+	insertDCValue
+[admin@SMLABNSA-A-GV-HPC7-20 PMR_DC]#

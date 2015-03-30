@@ -1,0 +1,80 @@
+#PMR DC Script Version
+VERSION=2.0
+
+# CLLI sites that need to be skipped for PM file generation
+SKIPCLLI="SOMESITEADC SOMESITEABC"
+
+#DC value should be PNSA/VISP/CMDS
+INSTALLTYPE=insertdcvalue
+
+BASEPATH="/data/scripts/PMR/${INSTALLTYPE}"
+DATAPATH="/data/gms/pmr/data"
+
+REMOTEDATAPATH="/data/mgmt/pmr/data/pm/${INSTALLTYPE}"
+SAPSCRIPTPATH="/data/mgmt/pmr/scripts/pm/${INSTALLTYPE}"
+
+PMFILEWRITER="${BASEPATH}/pmfile_writer.sh"
+LOGFILE=/var/log/PMRLogger.log
+
+# Clean data older than X days
+CLEANDATE=3
+
+# Binaries
+SSH='/usr/bin/ssh -q -o ConnectTimeout=5 -o UserKnownHostsFile=/dev/null -l root '
+SADF=`which sadf`
+AWK=`which awk`
+DATE=`which date`
+CLI="/opt/tms/bin/cli -t 'en' 'conf t' "
+CLIRAW='/opt/tms/bin/cli '
+PMX='/opt/tps/bin/pmx.py'
+HADOOP='/opt/hadoop/bin/hadoop'
+RSYNC='/usr/bin/rsync'
+RSYNCOPT=' -azre ssh '
+RSYNCEXCLUDEPMR=' --exclude=var --exclude=*.csv '
+CLLI=`hostname | awk -F- '{print $1}' | sed -e 's/NSA$//g'`
+ENTITY=`hostname | awk -F- '{print $1}' | sed -e 's/NSA$//g'`
+COMMUNITY="2Y2LHTZP31"
+
+# Remote Host to Sync PM files
+REMOTEHOST="10.10.21.70 10.10.21.69 10.10.21.68"
+SAPNODES="10.10.21.70 10.10.21.68 10.10.21.69"
+# Node Status return codes
+   NAMENODE=2
+   DATANODE=4
+SECONDARYNN=8
+ JOBTRACKER=16
+   CATALINA=32
+TASKTRACKER=64
+     HSQLDB=128
+     TOMCAT=256
+      TIBCO=512
+    CALPONT=1024
+  COLLECTOR=2048
+
+# Hadoop site status return codes (bitmask)
+   S_NAMENODE=2
+   S_DATANODE=100
+S_SECONDARYNN=8
+ S_JOBTRACKER=16
+   S_CATALINA=32
+
+function am_i_master
+{
+  role='';role=`/opt/tms/bin/cli -t 'en' 'conf t' 'show cluster local' | grep Role | awk '{print $NF}' | sed 's/ //g'`
+  if [[ $role && "${role}" == "master" ]]; then echo 0; else echo 127 ; fi
+}
+
+function write_log
+{
+  printf "%s [%s] %s\n" "`date`" "`basename $0`" "$*" >> ${LOGFILE}
+}
+
+function skip_clli
+{
+  if [[ `echo $SKIPCLLI | grep -w $ENTITY` ]]; then
+      write_log "Ordered to skip $ENTITY processing! Skip CLLI configured for the site."
+      exit 0
+  fi
+}
+skip_clli
+
