@@ -34,13 +34,36 @@ function issueCommands {
 	echo "---Installing PMR"
 	for host in ${NN}; do
 	   ${SSH} $host '/bin/mount -o remount,rw /'
-           #${SSH} $host "/bin/rm -rf ${SOURCE}/PMR_DC"
-	   ${SSH} $host "/bin/mkdir -p ${INSTALLPATH}/var"
-	   /usr/bin/scp -q ${SOURCE}/${TOOL} root@${host}:${DEST}
-	   ${SSH} $host "/bin/tar zxvf ${DEST}/${TOOL} -C ${INSTALLPATH}" 1>/dev/null
-	   ${SSH} $host "/bin/chmod -R 755 ${INSTALLPATH}/*"
+	   echo "---Backing up PMR-V1 on $host"
+	   if [[ ! `${SSH} $host "/bin/ls ${INSTALLPATH}-V1-obsolete 2>/dev/null"` ]]; then
+	        ${SSH} $host "/bin/mv ${INSTALLPATH} ${INSTALLPATH}-V1-obsolete 2>/dev/null"
+	   	if [[ $? -ne '0' ]]; then
+			if [[ `${SSH} $host "/bin/ls ${INSTALLPATH} 2>/dev/null"` ]]; then
+			    echo "---FAILED to backup PMR-V1 on $host Try re-running the install. Committing Exit!"
+			    exit 0
+			else 
+			    echo "---WARNING: PMR-V1 install not found on the system $host"
+			    ack=''
+			    while [[ $ack != "y" && $ack != "n" ]]; do
+				read -p "Do you want to install the PMR-V2 directly (if yes, then backout will not be supported!)? (y/n) : " ack
+			    done
+			    if [[ $ack == 'n' ]]; then echo "---You chose to install PMR-V1 first. Thank you!"; exit; fi
+			fi
+		else 
+			echo "---Success!"
+		fi
+	   else 
+		echo "---Already backed up!"
+	   fi
+	   ${SSH} $host "/bin/mkdir -p ${INSTALLPATH}/DC/${CLLI}/"
+	   /usr/bin/scp -q ${SOURCE}/${TOOL} root@${host}:${DEST} 
+	   if [[ $? -ne '0' ]]; then 
+		echo "---Unable to transfer toolset ${TOOL} to host ${host}! Skipping..."; 
+	   else 
+		${SSH} $host "/bin/tar zxvf ${DEST}/${TOOL} -C ${INSTALLPATH}" 1>/dev/null
+                ${SSH} $host "/bin/chmod -R 755 ${INSTALLPATH}/*"
+	   fi
 	done
-
 }
 
 function createSAN {
@@ -49,11 +72,31 @@ function createSAN {
 	   echo "---Transferring toolset to management node : ${prefix1}${mgt}"
 	   ${SSH} ${prefix1}${mgt} "/bin/mount -o remount,rw /"
 	   /usr/bin/scp -q ${SOURCE}/${TOOL} root@${prefix1}${mgt}:${DEST}
+	   echo "---Backing up PMR-V1 at SAN Repository"
+	   if [[ ! `${SSH} ${prefix1}${mgt} "/bin/ls ${REMOTESANREPO}-V1-obsolete 2>/dev/null"` ]]; then
+	        ${SSH} ${prefix1}${mgt} "/bin/mv ${REMOTESANREPO} ${REMOTESANREPO}-V1-obsolete 2>/dev/null"
+	   	if [[ $? -ne '0' ]]; then
+			if [[ `${SSH} ${prefix1}${mgt} "/bin/ls ${REMOTESANREPO} 2>/dev/null"` ]]; then
+                	    echo "---FAILED to backup PMR-V1 on ${prefix1}${mgt}! Try re-running the install. Committing Exit!"
+                	    exit 0
+			else
+			    echo "---WARNING: PMR-V1 install not found at repository ${prefix1}${mgt}"
+			    ack=''
+                            while [[ $ack != 'y' && $ack != 'n' ]]; do
+                                read -p "Do you want to install the PMR-V2 directly at repository (if yes, then backout will not be supported!)? (y/n) : " ack
+                            done
+                            if [[ $ack == 'n' ]]; then echo "---You chose to install PMR-V1 first. Thank you!"; exit; fi
+                        fi
+		else
+			echo "---Success!"
+           	fi
+           else
+		echo "---Already backed up!"
+	   fi
 	   ${SSH} ${prefix1}${mgt} "/bin/mkdir -p ${REMOTESANREPO}/DC/${CLLI}/"
 	   ${SSH} ${prefix1}${mgt} "/bin/tar zxvf ${DEST}/${TOOL} -C ${REMOTESANREPO}" 1>/dev/null
 	   ${SSH} ${prefix1}${mgt} "/bin/chmod -R 755 ${REMOTESANREPO}/*"
 	done
-
 }
 
 function symLink {
@@ -112,6 +155,10 @@ function insertDCValue {
 	   if [[ ${DC} == 'VISP' ]] ; then
         	${SSH} ${host} "perl -pi -e 's/^DATAPATH=.*$/DATAPATH=\"\/data\/gms\/pmr\/data\"/' ${INSTALLPATH}/etc/*" 2>/dev/null
            fi
+	# Prepare site architecture.
+	   echo "---Creating site architecture at $host."
+           ${SSH} $host "cd ${INSTALLPATH}/bin; ${INSTALLPATH}/bin/prepare_site.sh "
+	   if [[ $? -ne '0' ]]; then echo "---WARNING: Contact Guavus Support."; else echo "---Success!"; fi
 	done	
 	${SSH} ${prefix1}${mgmt0} "perl -pi -e 's/insertdcvalue/$DC/g' ${REMOTESANREPO}/etc/*"
 	${SSH} ${prefix1}${mgmt0} "perl -pi -e 's/insertdcvalue/$DC/g' ${REMOTESANREPO}/bin/*"
@@ -119,6 +166,7 @@ function insertDCValue {
 	if [[ ${DC} == 'VISP' ]] ; then
 	   ${SSH} ${prefix1}${mgmt0} "perl -pi -e 's/^DATAPATH=.*$/DATAPATH=\"\/data\/gms\/pmr\/data\"/' ${REMOTESANREPO}/etc/*" 2>/dev/null
 	fi
+	
 }
 
 if [[ ${DC} == 'PNSA' || ${DC} == 'VISP' || ${DC} == 'CMDS' ]]; then

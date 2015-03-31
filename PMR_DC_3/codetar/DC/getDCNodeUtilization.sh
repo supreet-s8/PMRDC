@@ -3,7 +3,7 @@
 # Fetch SAR data for CPU and Memory utilization for the current hour at 5 minute interval
 
 # -------------------------------------------------------------------------------------------------------
-BASEPATH=/data/scripts/PMR/VISP/insertdcvalue
+BASEPATH=/data/scripts/PMR/insertdcvalue
 
 # Read main configuration file
 source ${BASEPATH}/etc/PMRConfig.cfg

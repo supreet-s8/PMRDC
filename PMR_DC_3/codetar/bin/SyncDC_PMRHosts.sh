@@ -3,10 +3,9 @@
 # Read Configuration and quit if not standby
 . /data/scripts/PMR/insertdcvalue/etc/PMRConfig.cfg
 
-HOSTNAME=`hostname`
+if [[ `am_i_master` -eq 0 ]] ; then exit 0; fi
 
-export CLI SSH BASEPATH DATAPATH HOSTNAME SKIPCLLI
-if [[ `$BASEPATH/bin/checkStandby.pl` -ne 0 ]] ; then exit 0; fi
+HOSTNAME=`hostname`
 
 # Since all DC sites will start rsync at the same time, we randomly sleep from 1 to 240 secs.
 # So that there is some random distribution of rsync event.

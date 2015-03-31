@@ -21,7 +21,7 @@ ROUNDOFF=$(echo "(${CURR}-(${CURR}%${FILEStamp}))+${FILEStamp}" | bc)
 myY=`date -d @${ROUNDOFF} +%Y`
 myM=`date -d @${ROUNDOFF} +%m`
 myD=`date -d @${ROUNDOFF} +%d`
-PMDIR="$DATAPATH/$myY/$myM/$myD"
+PMDIR="$DATAPATH/${ENTITY}/$myY/$myM/$myD"
 PMFILE=`date -d @${ROUNDOFF} +"PM-${ENTITY}-%Y%m%d-%H%M-${TYPE}-0.csv"`
 PMPATH="$PMDIR/$PMFILE"
 

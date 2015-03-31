@@ -1,6 +1,6 @@
 #!/bin/bash
 
-/bin/bash prepareIP.sh
+#/bin/bash prepareIP.sh
 
 IPS="$PWD/IP.sh"
 function getHosts()
