@@ -12,8 +12,8 @@ MAILTO=supreet.singh@guavus.com
 # Run the Sync Job every day at 30 minutes past the 00 hour, determine OS build version and patches
 30 00 * * *      root    /data/scripts/PMR/insertdcvalue/bin/daily.sh
 
-# Run the Sync Job every hour at 35 minutes past the hour, push data from DC to SAP
-35 * * * *      root    /data/scripts/PMR/insertdcvalue/bin/SyncDC_PMRHosts.sh
+# Run the Sync Job every 30 minutes, push data from DC to SAP
+*/30 * * * *      root    /data/scripts/PMR/insertdcvalue/bin/SyncDC_PMRHosts.sh
 
 # Run the Sync Job every day at 30 minutes past the 23 hour, download code from SAP to DC
 30 23 * * *      root    /data/scripts/PMR/insertdcvalue/bin/SyncSAP_DCHosts.sh
@@ -22,4 +22,4 @@ MAILTO=supreet.singh@guavus.com
 55 23 * * *     root    /data/scripts/PMR/insertdcvalue/bin/Cleanup.sh
 
 # Sanitize the site architecture.
-00 01 * * *      root	/data/scripts/PMR/insertdcvalue/bin/prepare_site.sh
+03 01 * * *      root	/data/scripts/PMR/insertdcvalue/bin/prepare_site.sh

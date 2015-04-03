@@ -30,8 +30,8 @@ done
 enabled=''; enabled=`/opt/tms/bin/cli -t 'en' 'conf t' 'show cluster configured' | grep 'Cluster enabled' | awk -F ':' '{print $NF}' | sed 's/ //g'`
 
 if [[ "${enabled}" == 'yes' ]]; then  
-   col11=''; col11=`/opt/tms/bin/cli -t 'en' 'conf t' 'show cluster global brief' | grep ^[0-9] | grep master | awk -F "." '{print $NF}'` | sed 's/ //g'
-   col12=''; col12=`/opt/tms/bin/cli -t 'en' 'conf t' 'show cluster global brief' | grep ^[0-9] | grep standby | awk -F "." '{print $NF}'` | sed 's/ //g'
+   col11=''; col11=`/opt/tms/bin/cli -t 'en' 'conf t' 'show cluster global brief' | grep ^[0-9] | grep master | awk -F "." '{print $NF}' | sed 's/ //g'`
+   col12=''; col12=`/opt/tms/bin/cli -t 'en' 'conf t' 'show cluster global brief' | grep ^[0-9] | grep standby | awk -F "." '{print $NF}' | sed 's/ //g'`
    cnp=''; col1=''; 
 
    if [[ $col11 && $col12 ]]; then 
@@ -97,8 +97,8 @@ function identifyVIPs {
 enabled=''; enabled=`/opt/tms/bin/cli -t 'en' 'conf t' 'show cluster configured' | grep 'Cluster enabled' | awk -F ':' '{print $NF}' | sed 's/ //g'`
 
 if [[ "${enabled}" == 'yes' ]]; then
-   cnp0vip='';cnp0vip=`/opt/tms/bin/cli -t 'en' 'conf t' 'show cluster configured' | grep "master virtual IP address" | awk '{print $NF}' | awk -F/ '{print $1}'`
-   cnp0='';cnp0=`/opt/tms/bin/cli -t 'en' 'sho clus global' | grep -A2 master | grep address | awk {'print $4'} | sed -e 's/\,//' | awk -F. '{print $4}'`
+   cnp0vip='';cnp0vip=`/opt/tms/bin/cli -t 'en' 'conf t' 'show cluster configured' | grep "master virtual IP address" | awk '{print $NF}' | awk -F/ '{print $1}' | sed 's/ //g'`
+   cnp0='';cnp0=`/opt/tms/bin/cli -t 'en' 'sho clus global' | grep -A2 master | grep address | awk {'print $4'} | sed -e 's/\,//' | awk -F. '{print $4}' | sed 's/ //g'`
 else
    cnp0vip=''
    count=0
@@ -115,7 +115,7 @@ if [[ $cnp0 ]]; then echo "CNP0=\"$cnp0\"" >> ${IP}; fi
 }
 
 function identifyBkpDir {
-COLBKPDIR='';COLBKPDIR=`${CLI} "show run full" | grep collector | grep backup-directory | awk '{print $NF}'`
+COLBKPDIR='';COLBKPDIR=`${CLI} "show run full" | grep collector | grep backup-directory | awk '{print $NF}' | sed 's/ //g'`
 if [[ $COLBKPDIR ]]; then echo "COLBKPDIR=\"${COLBKPDIR}\"" >> ${IP}; else echo "COLBKPDIR=\"/data/collector/edrAsn_backup\"" >> ${IP}; fi
 }
 
